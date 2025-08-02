@@ -1,21 +1,12 @@
 import streamlit as st
 import joblib
 import numpy as np
+import pandas as pd
 
-# Load model
+# Load model and metadata
 model = joblib.load("ridge_model.pkl")
-
 feature_names = joblib.load("model_features.pkl")
 default_values = joblib.load("default_values.pkl")
-
-# Create input vector with defaults
-input_data = {feature: user_inputs.get(feature, default_values.get(feature)) for feature in feature_names}
-
-# Convert to DataFrame with correct column order
-input_df = pd.DataFrame([input_data])[feature_names]
-
-# Predict
-prediction = model.predict(input_df)[0]
 
 # Page config
 st.set_page_config(page_title="Ames House Price Predictor", layout="centered")
@@ -29,7 +20,7 @@ st.markdown("""
 st.title("🏠 Ames House Price Predictor")
 st.markdown("Enter the details below to predict the **house price in Ames, Iowa**.")
 
-# --- Top Ridge Features ---
+# --- Key Input Features ---
 st.header("🏡 Key House Features")
 
 col1, col2 = st.columns(2)
@@ -51,20 +42,19 @@ with col2:
     year_remod = st.slider("Year Remodeled", 1950, 2024, 2000)
     mssubclass = st.selectbox("MS SubClass", [20, 30, 50, 60, 70, 80, 90, 120, 160, 180])
 
-# Derived values
-total_bath = full_bath + 0.5 * half_bath + bsmt_full_bath
-gr_liv_area = first_flr_sf + second_flr_sf
-
-# Encodings
-central_air_encoded = 1 if central_air == "Yes" else 0
-bsmt_exposure_encoded = 1  # Simplified (assume exposed); you can expand this with a selectbox if needed
+# Encoding maps
 kitchen_qual_map = {"Poor": 1, "Fair": 2, "Typical": 3, "Good": 4, "Excellent": 5}
 fireplace_qu_map = {"None": 0, "Poor": 1, "Fair": 2, "Typical": 3, "Good": 4, "Excellent": 5}
 
-import pandas as pd
-
+# Prediction logic
 if st.button("🔮 Predict House Price"):
-    # Gather only the user-filled fields
+    # Derived values
+    total_bath = full_bath + 0.5 * half_bath + bsmt_full_bath
+    gr_liv_area = first_flr_sf + second_flr_sf
+    central_air_encoded = 1 if central_air == "Yes" else 0
+    bsmt_exposure_encoded = 1  # You can expand this later with user input if needed
+
+    # Only user-provided fields
     user_inputs = {
         "2ndFlrSF": second_flr_sf,
         "OverallQual": overall_qual,
@@ -72,7 +62,7 @@ if st.button("🔮 Predict House Price"):
         "TotalBsmtSF": total_bsmt_sf,
         "TotalBath": total_bath,
         "MSSubClass": mssubclass,
-        "SaleCondition_Normal": 1,  # Assume Normal
+        "SaleCondition_Normal": 1,  # Assumed as default
         "BsmtFinSF1": bsmtfin_sf1,
         "YearRemodAdd": year_remod,
         "GarageCars": garage_cars,
@@ -83,12 +73,12 @@ if st.button("🔮 Predict House Price"):
         "FireplaceQu": fireplace_qu_map[fireplace_qu],
     }
 
-    # Fill in full model-required feature vector
+    # Combine with defaults for all required features
     full_input = {feature: user_inputs.get(feature, default_values.get(feature, 0)) for feature in feature_names}
 
-    # Convert to DataFrame with correct column order
+    # Create input DataFrame
     input_df = pd.DataFrame([full_input])[feature_names]
 
-    # Predict
+    # Predict and show result
     predicted_price = model.predict(input_df)[0]
     st.success(f"🏡 Estimated Price: **${predicted_price:,.0f}**")
