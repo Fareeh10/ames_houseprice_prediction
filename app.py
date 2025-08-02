@@ -2,10 +2,10 @@ import streamlit as st
 import joblib
 import numpy as np
 
-# Load the trained model
-model = joblib.load("ridge_model.pkl")  # Use your actual model
+# Load model
+model = joblib.load("ridge_model.pkl")
 
-# Set page config and warning banner
+# Page config
 st.set_page_config(page_title="Ames House Price Predictor", layout="centered")
 
 st.markdown("""
@@ -17,7 +17,7 @@ st.markdown("""
 st.title("🏠 Ames House Price Predictor")
 st.markdown("Enter the details below to predict the **house price in Ames, Iowa**.")
 
-# --- Group 1: General Information ---
+# --- General Info ---
 st.header("🏡 General Information")
 col1, col2 = st.columns(2)
 with col1:
@@ -27,37 +27,43 @@ with col2:
     full_bath = st.slider("Full Bathrooms", 0, 4, 2)
     half_bath = st.slider("Half Bathrooms", 0, 2, 1)
 
-# --- Group 2: Area & Size ---
+# --- Size & Area ---
 st.header("📏 Size Details")
 col3, col4 = st.columns(2)
 with col3:
     gr_liv_area = st.number_input("Above Ground Living Area (sqft)", 300, 6000, 1500)
-    total_bsmt_sf = st.number_input("Total Basement Area (sqft)", 0, 3000, 800)
+    first_flr_sf = st.number_input("1st Floor SF", 300, 3000, 1200)
 with col4:
-    lot_area = st.number_input("Lot Area (sqft)", 1000, 50000, 8000)
-    garage_cars = st.slider("Garage Capacity (cars)", 0, 4, 2)
+    second_flr_sf = st.number_input("2nd Floor SF", 0, 3000, 400)
+    total_bsmt_sf = st.number_input("Basement Area (sqft)", 0, 3000, 800)
 
-# --- Optional: Advanced Features in Expander ---
-with st.expander("🔧 Advanced Options (Optional)"):
-    col5, col6 = st.columns(2)
-    with col5:
-        kitchen_qual = st.selectbox("Kitchen Quality", ['Poor', 'Fair', 'Typical', 'Good', 'Excellent'])
-        fireplace_qu = st.selectbox("Fireplace Quality", ['None', 'Poor', 'Fair', 'Typical', 'Good'])
-    with col6:
-        tot_rms_abv_grd = st.slider("Total Rooms Above Ground", 2, 15, 6)
-        garage_area = st.number_input("Garage Area (sqft)", 0, 1500, 400)
+# Derived bath counts
+st.header("🛁 Bathrooms")
+bsmt_full_bath = st.slider("Basement Full Baths", 0, 3, 1)
+total_bath = full_bath + 0.5 * half_bath + bsmt_full_bath
 
-    # Add more features below as needed
-
-# --- Prediction Button ---
+# --- Prediction ---
 if st.button("🔮 Predict House Price"):
-    # You’ll need to match the order and number of features exactly with training
-    input_data = np.array([[
-        overall_qual, gr_liv_area, garage_cars,
-        total_bsmt_sf, year_built, full_bath,
-        half_bath, lot_area, tot_rms_abv_grd, garage_area
-        # Add more advanced features here in same order as model was trained
-    ]])
 
+    # Compute polynomial/interaction features manually (top ones)
+    features = {
+        "BsmtFullBath TotalBath": bsmt_full_bath * total_bath,
+        "2ndFlrSF GrLivArea": second_flr_sf * gr_liv_area,
+        "1stFlrSF GrLivArea": first_flr_sf * gr_liv_area,
+        "FullBath TotalBath": full_bath * total_bath,
+        "1stFlrSF 2ndFlrSF": first_flr_sf * second_flr_sf,
+        "GrLivArea^2": gr_liv_area ** 2,
+        "TotalBath^2": total_bath ** 2,
+        "BsmtFullBath FullBath": bsmt_full_bath * full_bath,
+        "HalfBath TotalBath": half_bath * total_bath,
+        "TotalBath": total_bath,
+        "2ndFlrSF^2": second_flr_sf ** 2,
+        "FullBath HalfBath": full_bath * half_bath,
+        "GrLivArea TotalBath": gr_liv_area * total_bath
+        # Add more if used in training
+    }
+
+    input_data = np.array([list(features.values())])
     predicted_price = model.predict(input_data)[0]
+
     st.success(f"🏡 Estimated Price: **${predicted_price:,.0f}**")
