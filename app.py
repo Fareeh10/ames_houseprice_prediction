@@ -5,6 +5,18 @@ import numpy as np
 # Load model
 model = joblib.load("ridge_model.pkl")
 
+feature_names = joblib.load("model_features.pkl")
+default_values = joblib.load("default_values.pkl")
+
+# Create input vector with defaults
+input_data = {feature: user_inputs.get(feature, default_values.get(feature)) for feature in feature_names}
+
+# Convert to DataFrame with correct column order
+input_df = pd.DataFrame([input_data])[feature_names]
+
+# Predict
+prediction = model.predict(input_df)[0]
+
 # Page config
 st.set_page_config(page_title="Ames House Price Predictor", layout="centered")
 
@@ -49,26 +61,34 @@ bsmt_exposure_encoded = 1  # Simplified (assume exposed); you can expand this wi
 kitchen_qual_map = {"Poor": 1, "Fair": 2, "Typical": 3, "Good": 4, "Excellent": 5}
 fireplace_qu_map = {"None": 0, "Poor": 1, "Fair": 2, "Typical": 3, "Good": 4, "Excellent": 5}
 
-# --- Predict ---
+import pandas as pd
+
 if st.button("🔮 Predict House Price"):
+    # Gather only the user-filled fields
+    user_inputs = {
+        "2ndFlrSF": second_flr_sf,
+        "OverallQual": overall_qual,
+        "1stFlrSF": first_flr_sf,
+        "TotalBsmtSF": total_bsmt_sf,
+        "TotalBath": total_bath,
+        "MSSubClass": mssubclass,
+        "SaleCondition_Normal": 1,  # Assume Normal
+        "BsmtFinSF1": bsmtfin_sf1,
+        "YearRemodAdd": year_remod,
+        "GarageCars": garage_cars,
+        "BsmtExposure_Yes": bsmt_exposure_encoded,
+        "CentralAir_Y": central_air_encoded,
+        "GrLivArea": gr_liv_area,
+        "KitchenQual": kitchen_qual_map[kitchen_qual],
+        "FireplaceQu": fireplace_qu_map[fireplace_qu],
+    }
 
-    input_data = np.array([[
-        second_flr_sf,
-        overall_qual,
-        first_flr_sf,
-        total_bsmt_sf,
-        total_bath,
-        mssubclass,
-        1,  # SaleCondition (simplified as 'Normal')
-        bsmtfin_sf1,
-        year_remod,
-        garage_cars,
-        bsmt_exposure_encoded,
-        central_air_encoded,
-        gr_liv_area,
-        kitchen_qual_map[kitchen_qual],
-        fireplace_qu_map[fireplace_qu]
-    ]])
+    # Fill in full model-required feature vector
+    full_input = {feature: user_inputs.get(feature, default_values.get(feature, 0)) for feature in feature_names}
 
-    predicted_price = model.predict(input_data)[0]
+    # Convert to DataFrame with correct column order
+    input_df = pd.DataFrame([full_input])[feature_names]
+
+    # Predict
+    predicted_price = model.predict(input_df)[0]
     st.success(f"🏡 Estimated Price: **${predicted_price:,.0f}**")
