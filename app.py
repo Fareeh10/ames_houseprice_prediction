@@ -74,21 +74,21 @@ if st.button("🔮 Predict House Price"):
         "FireplaceQu": fireplace_qu_map[fireplace_qu],
     }
 
-    # Fill in missing features with defaults
-    input_data = {
-        feature: user_inputs.get(feature, default_values.get(feature, 0))
-        for feature in feature_names
-    }
+# Fill in missing features with defaults
+input_data = {
+    feature: user_inputs.get(feature, default_values.get(feature, 0))
+    for feature in feature_names
+}
 
-        input_df = pd.DataFrame([input_data])
+input_df = pd.DataFrame([input_data])
 
-    # Apply log1p transformation to the same features used during training
-    log_features = ['BsmtFinSF1', '1stFlrSF', 'GrLivArea', 'OpenPorchSF', 'EnclosedPorch', 'WoodDeckSF']
-    for feat in log_features:
-        if feat in input_df.columns:
-            input_df[feat] = np.log1p(input_df[feat])
+# Apply log1p transformation to the same features used during training
+log_features = ['BsmtFinSF1', '1stFlrSF', 'GrLivArea', 'OpenPorchSF', 'EnclosedPorch', 'WoodDeckSF']
+for feat in log_features:
+    if feat in input_df.columns:
+        input_df[feat] = np.log1p(input_df[feat])
 
-    # Predict (remember: target was log-transformed, so apply expm1)
-    predicted_price = np.expm1(model.predict(input_df)[0])
-    
-    st.success(f"💰 **Estimated House Price: ${predicted_price:,.0f}**")
+# Predict (remember: target was log-transformed, so apply expm1)
+predicted_price = np.expm1(model.predict(input_df)[0])
+
+st.success(f"💰 **Estimated House Price: ${predicted_price:,.0f}**")
