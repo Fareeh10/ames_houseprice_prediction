@@ -4,9 +4,8 @@ import numpy as np
 import pandas as pd
 from sklearn.pipeline import Pipeline
 
-# Load Ridge model
-with open('ridge_model.pkl', 'rb') as f:
-    model: Pipeline = pickle.load(f)
+import joblib
+model: Pipeline = joblib.load("ridge_model.pkl")
 
 # Load important features, default values, and all feature names
 with open('top_features.pkl', 'rb') as f:
