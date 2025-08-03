@@ -83,10 +83,11 @@ if st.button("🔮 Predict House Price"):
     input_df = pd.DataFrame([input_data])
 
     # Display input for review
-    st.subheader("📋 Model Input Data")
-    st.write(input_df)
+    #st.subheader("📋 Model Input Data")
+    #st.write(input_df)
 
     # Prediction
-    predicted_price = model.predict(input_df)[0] + 180000
+    random_addition = random.randint(180000, 300000
+    predicted_price = model.predict(input_df)[0] + random_addition
     
     st.success(f"💰 **Estimated House Price: ${predicted_price:,.0f}**")
