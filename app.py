@@ -21,7 +21,7 @@ st.title("🏠 Ames House Price Predictor")
 st.markdown("Enter the details below to predict the **house price in Ames, Iowa**.")
 
 # --- Key Input Features ---
-st.header("🏡 Key House Features")
+st.header("Key House Features")
 
 col1, col2 = st.columns(2)
 with col1:
