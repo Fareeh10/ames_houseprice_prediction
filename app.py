@@ -80,5 +80,5 @@ if st.button("🔮 Predict House Price"):
     input_df = pd.DataFrame([full_input])[feature_names]
 
     # Predict and show result
-    predicted_price = model.predict(input_df)[0]
+    predicted_price = np.expm1(model.predict(input_df)[0])
     st.success(f"🏡 Estimated Price: **${predicted_price:,.0f}**")
