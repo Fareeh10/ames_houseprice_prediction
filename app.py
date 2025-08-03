@@ -80,14 +80,15 @@ if st.button("🔮 Predict House Price"):
         for feature in feature_names
     }
 
-    # Create DataFrame for input
-    input_df = pd.DataFrame([input_data])
+        input_df = pd.DataFrame([input_data])
 
-    # Display input for review
-    #st.subheader("📋 Model Input Data")
-    #st.write(input_df)
+    # Apply log1p transformation to the same features used during training
+    log_features = ['BsmtFinSF1', '1stFlrSF', 'GrLivArea', 'OpenPorchSF', 'EnclosedPorch', 'WoodDeckSF']
+    for feat in log_features:
+        if feat in input_df.columns:
+            input_df[feat] = np.log1p(input_df[feat])
 
-    # Prediction
+    # Predict (remember: target was log-transformed, so apply expm1)
     predicted_price = np.expm1(model.predict(input_df)[0])
     
     st.success(f"💰 **Estimated House Price: ${predicted_price:,.0f}**")
