@@ -88,7 +88,6 @@ if st.button("🔮 Predict House Price"):
     #st.write(input_df)
 
     # Prediction
-    random_addition = random.randint(180000, 300000)
-    predicted_price = model.predict(input_df)[0] + random_addition
+    predicted_price = np.expm1(model.predict(input_df)[0])
     
     st.success(f"💰 **Estimated House Price: ${predicted_price:,.0f}**")
