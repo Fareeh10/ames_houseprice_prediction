@@ -73,15 +73,18 @@ if st.button("🔮 Predict House Price"):
         "FireplaceQu": fireplace_qu_map[fireplace_qu],
     }
 
-    # Combine with defaults for all required features
-    full_input = {feature: user_inputs.get(feature, default_values.get(feature, 0)) for feature in feature_names}
+    # Fill in missing features with defaults
+    input_data = {
+        feature: user_inputs.get(feature, default_values.get(feature, 0))
+        for feature in feature_names
+    }
     
-    # Create input DataFrame and ensure correct order
-    input_df = pd.DataFrame([full_input])[feature_names]
-    
+    # Create DataFrame for input
+    input_df = pd.DataFrame([input_data])
+
     # Show input for debugging
     st.write("🔍 Input to Model:", input_df)
-
-    # Predict and show result
-    predicted_price = model.predict(input_df)[0]
-    st.success(f"🏡 Estimated Price: **${predicted_price:,.0f}**")
+    
+    # Predict
+    predicted_price = model.predict(input_df)[0]  # price in dollars, not log
+    print(f"Estimated Price: ${predicted_price:,.0f}")
