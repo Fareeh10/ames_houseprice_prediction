@@ -5,7 +5,7 @@ import pandas as pd
 import random
 
 # Load model and metadata
-model = joblib.load("ridge_model.pkl")
+model = joblib.load("ridge_model-2.pkl")
 feature_names = joblib.load("model_features.pkl")
 default_values = joblib.load("default_values.pkl")
 
