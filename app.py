@@ -2,6 +2,7 @@ import streamlit as st
 import joblib
 import numpy as np
 import pandas as pd
+import random
 
 # Load model and metadata
 model = joblib.load("ridge_model.pkl")
