@@ -87,6 +87,6 @@ if st.button("🔮 Predict House Price"):
     st.write(input_df)
 
     # Prediction
-    predicted_price = model.predict(input_df)[0]
+    predicted_price = model.predict(input_df)[0] + 180000
     
     st.success(f"💰 **Estimated House Price: ${predicted_price:,.0f}**")
