@@ -1,94 +1,42 @@
 import streamlit as st
-import joblib
+import pickle
 import numpy as np
 import pandas as pd
-import random
+from sklearn.pipeline import Pipeline
 
-# Load model and metadata
-model = joblib.load("ridge_model-2.pkl")
-feature_names = joblib.load("model_features.pkl")
-default_values = joblib.load("default_values.pkl")
+# Load Ridge model
+with open('ridge_model.pkl', 'rb') as f:
+    model: Pipeline = pickle.load(f)
 
-# Page config
-st.set_page_config(page_title="Ames House Price Predictor", layout="centered")
+# Load important features, default values, and all feature names
+with open('top_features.pkl', 'rb') as f:
+    top_features = pickle.load(f)
 
-st.markdown("""
-<div style="background-color:#fff3cd; padding:10px; border-left:6px solid #ffa500; margin-bottom:20px;">
-    <strong>🚧 Under Construction:</strong> This app is still being developed. Some features may not be final.
-</div>
-""", unsafe_allow_html=True)
+with open('default_values.pkl', 'rb') as f:
+    default_values = pickle.load(f)
 
-st.title("🏠 Ames House Price Predictor")
-st.markdown("Enter the details below to predict the **house price in Ames, Iowa**.")
+with open('feature_names.pkl', 'rb') as f:
+    all_features = pickle.load(f)
 
-# --- Key Input Features ---
-st.header("Key House Features")
+st.title("🏠 House Price Predictor")
 
-col1, col2 = st.columns(2)
-with col1:
-    overall_qual = st.slider("Overall Quality (1–10)", 1, 10, 5)
-    first_flr_sf = st.number_input("1st Floor SF", 300, 3000, 1200)
-    bsmtfin_sf1 = st.number_input("Finished Basement SF1", 0, 2000, 400)
-    garage_cars = st.slider("Garage Capacity (Cars)", 0, 5, 2)
-    kitchen_qual = st.selectbox("Kitchen Quality", ["Poor", "Fair", "Typical", "Good", "Excellent"])
-    fireplace_qu = st.selectbox("Fireplace Quality", ["None", "Poor", "Fair", "Typical", "Good", "Excellent"])
-    central_air = st.selectbox("Central Air", ["No", "Yes"])
+# Create input form
+user_inputs = {}
+st.subheader("Enter values for important features")
 
-with col2:
-    second_flr_sf = st.number_input("2nd Floor SF", 0, 3000, 400)
-    total_bsmt_sf = st.number_input("Total Basement SF", 0, 3000, 800)
-    full_bath = st.slider("Full Bathrooms", 0, 4, 2)
-    half_bath = st.slider("Half Bathrooms", 0, 2, 1)
-    bsmt_full_bath = st.slider("Basement Full Baths", 0, 3, 1)
-    year_remod = st.slider("Year Remodeled", 1950, 2024, 2000)
-    mssubclass = st.selectbox("MS SubClass", [20, 30, 50, 60, 70, 80, 90, 120, 160, 180])
+for feature in top_features:
+    default = round(default_values.get(feature, 0), 2)
+    user_inputs[feature] = st.number_input(f"{feature}", value=default)
 
-# Encoding maps
-kitchen_qual_map = {"Poor": 1, "Fair": 2, "Typical": 3, "Good": 4, "Excellent": 5}
-fireplace_qu_map = {"None": 0, "Poor": 1, "Fair": 2, "Typical": 3, "Good": 4, "Excellent": 5}
+# Fill in the remaining features with default values
+input_data = default_values.copy()
+input_data.update(user_inputs)
 
-# Predict button
-if st.button("🔮 Predict House Price"):
-    # Derived values
-    total_bath = full_bath + 0.5 * half_bath + bsmt_full_bath
-    gr_liv_area = first_flr_sf + second_flr_sf
-    central_air_encoded = 1 if central_air == "Yes" else 0
-    bsmt_exposure_encoded = 1  # assumed "Yes"
+# Ensure feature order matches model input
+input_df = pd.DataFrame([input_data])[all_features]
 
-    # Collect user inputs
-    user_inputs = {
-        "2ndFlrSF": second_flr_sf,
-        "OverallQual": overall_qual,
-        "1stFlrSF": first_flr_sf,
-        "TotalBsmtSF": total_bsmt_sf,
-        "TotalBath": total_bath,
-        "MSSubClass": mssubclass,
-        "SaleCondition_Normal": 1,  # assumed
-        "BsmtFinSF1": bsmtfin_sf1,
-        "YearRemodAdd": year_remod,
-        "GarageCars": garage_cars,
-        "BsmtExposure_Yes": bsmt_exposure_encoded,
-        "CentralAir_Y": central_air_encoded,
-        "GrLivArea": gr_liv_area,
-        "KitchenQual": kitchen_qual_map[kitchen_qual],
-        "FireplaceQu": fireplace_qu_map[fireplace_qu],
-    }
-
-# Fill in missing features with defaults
-input_data = {
-    feature: user_inputs.get(feature, default_values.get(feature, 0))
-    for feature in feature_names
-}
-
-input_df = pd.DataFrame([input_data])
-
-# Apply log1p transformation to the same features used during training
-log_features = ['BsmtFinSF1', '1stFlrSF', 'GrLivArea', 'OpenPorchSF', 'EnclosedPorch', 'WoodDeckSF']
-for feat in log_features:
-    if feat in input_df.columns:
-        input_df[feat] = np.log1p(input_df[feat])
-
-# Predict (remember: target was log-transformed, so apply expm1)
-predicted_price = np.expm1(model.predict(input_df)[0])
-
-st.success(f"💰 **Estimated House Price: ${predicted_price:,.0f}**")
+# Predict
+if st.button("Predict Sale Price"):
+    log_pred = model.predict(input_df)[0]
+    sale_price = np.expm1(log_pred)  # since target is log-transformed
+    st.success(f"🏡 Predicted Sale Price: ${sale_price:,.0f}")
