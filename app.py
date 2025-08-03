@@ -46,15 +46,15 @@ with col2:
 kitchen_qual_map = {"Poor": 1, "Fair": 2, "Typical": 3, "Good": 4, "Excellent": 5}
 fireplace_qu_map = {"None": 0, "Poor": 1, "Fair": 2, "Typical": 3, "Good": 4, "Excellent": 5}
 
-# Prediction logic
+# Predict button
 if st.button("🔮 Predict House Price"):
     # Derived values
     total_bath = full_bath + 0.5 * half_bath + bsmt_full_bath
     gr_liv_area = first_flr_sf + second_flr_sf
     central_air_encoded = 1 if central_air == "Yes" else 0
-    bsmt_exposure_encoded = 1  # You can expand this later with user input if needed
+    bsmt_exposure_encoded = 1  # assumed "Yes"
 
-    # Only user-provided fields
+    # Collect user inputs
     user_inputs = {
         "2ndFlrSF": second_flr_sf,
         "OverallQual": overall_qual,
@@ -62,7 +62,7 @@ if st.button("🔮 Predict House Price"):
         "TotalBsmtSF": total_bsmt_sf,
         "TotalBath": total_bath,
         "MSSubClass": mssubclass,
-        "SaleCondition_Normal": 1,  # Assumed as default
+        "SaleCondition_Normal": 1,  # assumed
         "BsmtFinSF1": bsmtfin_sf1,
         "YearRemodAdd": year_remod,
         "GarageCars": garage_cars,
@@ -78,13 +78,15 @@ if st.button("🔮 Predict House Price"):
         feature: user_inputs.get(feature, default_values.get(feature, 0))
         for feature in feature_names
     }
-    
+
     # Create DataFrame for input
     input_df = pd.DataFrame([input_data])
 
-    # Show input for debugging
-    st.write("🔍 Input to Model:", input_df)
+    # Display input for review
+    st.subheader("📋 Model Input Data")
+    st.write(input_df)
+
+    # Prediction
+    predicted_price = model.predict(input_df)[0]
     
-    # Predict
-    predicted_price = model.predict(input_df)[0]  # price in dollars, not log
-    print(f"Estimated Price: ${predicted_price:,.0f}")
+    st.success(f"💰 **Estimated House Price: ${predicted_price:,.0f}**")
