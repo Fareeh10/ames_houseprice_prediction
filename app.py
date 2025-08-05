@@ -152,8 +152,6 @@ else:
 
     # Handle categorical string-to-numeric inputs
     for feature, options in categorical_mappings.items():
-        if feature in cat:
-            continue;
         reverse_map = {v: k for k, v in options.items()}
         default_raw = default_values.get(feature, 0)
         default_str = reverse_map.get(default_raw, list(options.keys())[0])
@@ -162,7 +160,7 @@ else:
 
     # --- Other Features ---
     for feature in top_features:
-        if feature in basement_features:
+        if feature in basement_features or feature in cat:
             continue  # already handled seprately
 
         if feature in binary_features and feature not in ['Foundation_CBlock', 'Foundation_PConc', 'Foundation_Slab','NridgHt','Somerst']:
