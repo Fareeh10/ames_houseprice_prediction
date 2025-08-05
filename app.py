@@ -23,8 +23,7 @@ with open('feature_names.pkl', 'rb') as f:
 
 # Binary one-hot encoded features
 binary_features = [
-    'Foundation_CBlock', 'StoneBr', 'Somerst', 'Foundation_Slab',
-    'Foundation_PConc', 'NridgHt', 'CentralAir', 'BldgType_1Fam'
+    'CentralAir', 'BldgType_1Fam'
 ]
 
 # Features that were log-transformed during training
