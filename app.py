@@ -152,7 +152,7 @@ else:
 
     # Handle categorical string-to-numeric inputs
     for feature, options in categorical_mappings.items():
-        if feature in cat or feature in :
+        if feature in cat:
             continue;
         reverse_map = {v: k for k, v in options.items()}
         default_raw = default_values.get(feature, 0)
