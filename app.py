@@ -32,7 +32,7 @@ log_transformed_features = [
     'GrLivArea', 'OpenPorchSF', 'EnclosedPorch', 'WoodDeckSF'
 ]
 
-foundations = ['Foundation_CBlock','Foundation_PConc','Foundation_Slab']
+foundations = ['Foundation_CBlock','Foundation_PConc','Foundation_Slab','NridgHt','Somerst']
 
 # Categorical features mapping (string -> numeric)
 categorical_mappings = {
@@ -152,7 +152,7 @@ else:
 
     # Handle categorical string-to-numeric inputs
     for feature, options in categorical_mappings.items():
-        if feature in cat:
+        if feature in cat or feature in :
             continue;
         reverse_map = {v: k for k, v in options.items()}
         default_raw = default_values.get(feature, 0)
