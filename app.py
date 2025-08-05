@@ -23,7 +23,7 @@ with open('feature_names.pkl', 'rb') as f:
 
 # Binary one-hot encoded features
 binary_features = [
-    'CentralAir', 'BldgType_1Fam'
+    'CentralAir', 'BldgType_1Fam','HalfBath'
 ]
 
 # Features that were log-transformed during training
@@ -52,7 +52,6 @@ categorical_features = {
     "YearRemodAdd": list(range(1950, 2011)),
     "SaleCondition": [0, 1, 2, 3, 4],
     "Functional": [0, 1, 2],
-    "HalfBath": [0, 1]
 }
 
 basement_features = ['BsmtQual', 'BsmtFinSF1', 'BsmtUnfSF', 'BsmtExposure', 'TotalBsmtSF']
