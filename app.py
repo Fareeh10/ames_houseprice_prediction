@@ -66,13 +66,13 @@ if "show_inputs" not in st.session_state:
     st.session_state.show_inputs = False
 
 # Landing Page
+# Landing Page
 if not st.session_state.show_inputs:
     st.markdown(
         """
         <div style="background-color:#fff3cd; padding:10px; border-left:6px solid #ffa500; margin-bottom:20px;">
             <strong>🚧 Under Construction:</strong> This app is still being developed. UI/Some features may not be final.
         </div>
-        """, unsafe_allow_html=True)
 
         <div style='text-align: center; padding: 80px 0;'>
             <h1 style='font-size: 3em;color:#FF4B4B'>Ames House Price Predictor</h1>
