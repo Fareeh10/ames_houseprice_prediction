@@ -23,7 +23,7 @@ with open('feature_names.pkl', 'rb') as f:
 
 # Binary one-hot encoded features
 binary_features = [
-    'CentralAir', 'BldgType_1Fam'
+    'CentralAir', 'BldgType_1Fam','HalfBath'
 ]
 
 # Features that were log-transformed during training
@@ -47,14 +47,14 @@ categorical_mappings = {
     'BsmtQual': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1},
 }
 
+cat = ['SaleCondition','Functional','FireplaceQu','KitchenQual','ExterQual','HeatingQC','PavedDrive','BsmtExposure','BsmtQual']
 
 # Categorical / Ordinal encoded features with limited allowed values
 categorical_features = {
     "OverallQual": list(range(1, 11)),
     "YearRemodAdd": list(range(1950, 2011)),
     "SaleCondition": [0, 1, 2, 3, 4],
-    "Functional": [0, 1, 2],
-    "HalfBath": [0, 1]
+    "Functional": [0, 1, 2]
 }
 
 basement_features = ['BsmtQual', 'BsmtFinSF1', 'BsmtUnfSF', 'BsmtExposure', 'TotalBsmtSF']
@@ -152,6 +152,8 @@ else:
 
     # Handle categorical string-to-numeric inputs
     for feature, options in categorical_mappings.items():
+        if feature in cat:
+            continue;
         reverse_map = {v: k for k, v in options.items()}
         default_raw = default_values.get(feature, 0)
         default_str = reverse_map.get(default_raw, list(options.keys())[0])
