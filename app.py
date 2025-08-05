@@ -32,7 +32,7 @@ log_transformed_features = [
     'GrLivArea', 'OpenPorchSF', 'EnclosedPorch', 'WoodDeckSF'
 ]
 
-foundations = ['Foundation_CBlock','Foundation_PConc','Foundation_Slab','NridgHt','Somerst']
+foundations = ['Foundation_CBlock','Foundation_PConc','Foundation_Slab','NridgHt','Somerst','StoneBr']
 
 # Categorical features mapping (string -> numeric)
 categorical_mappings = {
