@@ -180,6 +180,8 @@ else:
             user_inputs[feature] = np.log1p(normal_val)
 
         else:
+            if feature in foundations:
+                continue;
             default = round(default_values.get(feature, 0))
             user_inputs[feature] = st.number_input(f"{feature}", value=default)
 
@@ -198,8 +200,6 @@ else:
                 normal_val = st.number_input(f"{feature} (normal value)", value=normal_val_default, min_value=0)
                 user_inputs[feature] = np.log1p(normal_val)
             else:
-                if feature in foundations:
-                    continue;
                 default = round(default_values.get(feature, 0))
                 user_inputs[feature] = st.number_input(f"{feature}", value=default)
 
