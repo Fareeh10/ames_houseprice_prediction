@@ -23,7 +23,8 @@ with open('feature_names.pkl', 'rb') as f:
 
 # Binary one-hot encoded features
 binary_features = [
-    'CentralAir', 'BldgType_1Fam','HalfBath'
+    'Foundation_CBlock', 'StoneBr', 'Somerst', 'Foundation_Slab',
+    'Foundation_PConc', 'NridgHt', 'CentralAir', 'BldgType_1Fam'
 ]
 
 # Features that were log-transformed during training
@@ -52,6 +53,7 @@ categorical_features = {
     "YearRemodAdd": list(range(1950, 2011)),
     "SaleCondition": [0, 1, 2, 3, 4],
     "Functional": [0, 1, 2],
+    "HalfBath": [0, 1]
 }
 
 basement_features = ['BsmtQual', 'BsmtFinSF1', 'BsmtUnfSF', 'BsmtExposure', 'TotalBsmtSF']
@@ -64,23 +66,72 @@ if "show_inputs" not in st.session_state:
     st.session_state.show_inputs = False
 
 # Landing Page
-# Landing Page
 if not st.session_state.show_inputs:
     st.markdown(
         """
-        <div style="background-color:#fff3cd; padding:10px; border-left:6px solid #ffa500; margin-bottom:20px;">
-            <strong>🚧 Under Construction:</strong> This app is still being developed. Will be completed soon</strong>
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+        html, body, [class*="css"]  {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .headline {
+            font-size: 3em;
+            font-weight: 700;
+            color: #ff4b4b;
+        }
+
+        .subheadline {
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .warning-box {
+            background-color: #fff3cd;
+            padding: 12px 20px;
+            border-left: 6px solid #ffa500;
+            border-radius: 5px;
+            margin-bottom: 25px;
+            color: #856404;
+        }
+
+        .centered {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .stButton>button {
+            background-color: #ff4b4b;
+            color: white;
+            font-size: 1.1em;
+            font-weight: 600;
+            padding: 0.75em 2em;
+            border-radius: 8px;
+            border: none;
+            transition: 0.3s ease;
+        }
+
+        .stButton>button:hover {
+            background-color: #e84343;
+            color:white;
+            transform: scale(1.02);
+        }
+        </style>
+
+        <div class="warning-box">
+            🚧 <strong>Under Construction:</strong> This app is still being developed. UI/Some features may not be final.
         </div>
 
-        <div style='text-align: center; padding: 80px 0;'>
-            <h1 style='font-size: 3em;color:#FF4B4B'>Ames House Price Predictor</h1>
-            <p style='font-size: 1.2em; color: gray;'>Predict house prices in Ames, Iowa using a trained ML model</p>
+        <div class="centered">
+            <div class="headline">🏠 Ames House Price Predictor</div>
+            <div class="subheadline">Predict house prices in Ames, Iowa using a trained ML model</div>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # ✅ Streamlit button instead of raw HTML
+    # Styled "Get Started" button
     if st.button("Get Started", use_container_width=True):
         st.session_state.show_inputs = True
         st.rerun()
