@@ -69,7 +69,7 @@ if not st.session_state.show_inputs:
     st.markdown(
         """
         <div style="background-color:#fff3cd; padding:10px; border-left:6px solid #ffa500; margin-bottom:20px;">
-            <strong>🚧 Under Construction:</strong> This app is still being developed. UI/Some features may not be final.
+            <strong>🚧 Under Construction:</strong> This app is still being developed. Will be completed soon</strong>
         </div>
 
         <div style='text-align: center; padding: 80px 0;'>
