@@ -163,7 +163,7 @@ else:
         if feature in basement_features or feature in cat:
             continue  # already handled seprately
 
-        if feature in binary_features and feature not in ['Foundation_CBlock', 'Foundation_PConc', 'Foundation_Slab','NridgHt','Somerst']:
+        if feature in binary_features and feature not in ['Foundation_CBlock', 'Foundation_PConc', 'Foundation_Slab','NridgHt','Somerst','StoneBr']:
             choice = st.radio(f"{feature}?", ["No", "Yes"], index=0, horizontal=True)
             user_inputs[feature] = 1 if choice == "Yes" else 0
 
@@ -231,11 +231,13 @@ else:
     if selected_foundation in foundation_feature_map:
         user_inputs[foundation_feature_map[selected_foundation]] = 1
 
-    neighborhood_options = ['NridgHt', 'Somerst', 'Other']
+    neighborhood_options = ['NridgHt', 'Somerst', 'StoneBr', 'Other']
     neighborhood_selection = st.selectbox("Select Neighborhood", neighborhood_options)
+    
+    # One-hot encode neighborhood selection
+    for neighborhood in neighborhood_options:
+        user_inputs[neighborhood] = 1 if neighborhood_selection == neighborhood else 0
 
-    user_inputs['NridgHt'] = 1 if neighborhood_selection == 'NridgHt' else 0
-    user_inputs['Somerst'] = 1 if neighborhood_selection == 'Somerst' else 0
 
     # Fill in other features not shown to user
     input_data = default_values.copy()
