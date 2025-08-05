@@ -168,10 +168,20 @@ else:
             user_inputs[feature] = 1 if choice == "Yes" else 0
 
         elif feature in categorical_features:
-            options = categorical_features[feature]
+            options = sorted(categorical_features[feature])
             default_val = default_values.get(feature, options[0])
-            index = options.index(default_val) if default_val in options else 0
-            user_inputs[feature] = st.slider(f"{feature}", min_value=min(options), max_value=max(options), value=options[index])
+        
+            # Ensure default is within the slider range
+            if default_val not in options:
+                default_val = options[0]
+        
+            user_inputs[feature] = st.slider(
+                f"{feature}",
+                min_value=min(options),
+                max_value=max(options),
+                step=1,  # Important for discrete numeric categories
+                value=default_val
+            )
 
         elif feature in log_transformed_features:
             log_val = default_values.get(feature, 0)
