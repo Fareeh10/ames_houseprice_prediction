@@ -32,6 +32,8 @@ log_transformed_features = [
     'GrLivArea', 'OpenPorchSF', 'EnclosedPorch', 'WoodDeckSF'
 ]
 
+foundations = ['Foundation_CBlock','Foundation_PConc','Foundation_Slab']
+
 # Categorical features mapping (string -> numeric)
 categorical_mappings = {
     'SaleCondition': {'Normal': 0, 'Partial': 1, 'Abnorml': 2, 'Family': 3, 'Alloca': 4, 'AdjLand': 5},
@@ -196,6 +198,8 @@ else:
                 normal_val = st.number_input(f"{feature} (normal value)", value=normal_val_default, min_value=0)
                 user_inputs[feature] = np.log1p(normal_val)
             else:
+                if feature in foundations:
+                    continue;
                 default = round(default_values.get(feature, 0))
                 user_inputs[feature] = st.number_input(f"{feature}", value=default)
 
