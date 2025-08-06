@@ -27,7 +27,7 @@ st.markdown("""
         margin: 0 auto;
         overflow: hidden;       /* Prevent scrollbars */
         text-align: center;
-        padding-top: 10%;
+        padding-top: 9%;
     }
     .headline { font-size: 3.5rem; line-height:4rem ;font-weight: 700; color: #2c3e50; margin-bottom: 1.5rem; }
     .subheadline { font-size: 1.3rem; color: #34495e; margin-bottom: 2rem; max-width: 600px; }
