@@ -172,7 +172,7 @@ else:
         with col2:
             user_inputs['YearRemodAdd'] = st.slider("Year Remodeled", 1950, 2011, get_default_value('YearRemodAdd', 2005), help="Remodel date (same as construction date if no remodeling).")
 
-        tab1, tab2, tab3, tab4 = st.tabs(["🏡 Exterior & Location", "📏 Area Details", "✨ Quality & Condition", "🛁 Rooms & Utilities"])
+        tab1, tab2, tab3, tab4 = st.tabs(["Exterior & Location", "Area Details", "Quality & Condition", "Rooms & Utilities"])
 
         with tab1:
             st.markdown("<h3>Location & Construction</h3>", unsafe_allow_html=True)
