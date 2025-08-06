@@ -57,7 +57,7 @@ st.markdown("""
     }
     .prediction-card { text-align: center; padding: 30px; }
     .prediction-header { font-size: 1.5rem; font-weight: 600; color: #34495e; margin-bottom: 10px; }
-    .prediction-value { font-size: 3rem; font-weight: 700; color: #ff4b4b; }
+    .prediction-value { font-size: 3rem; font-weight: 700; color: #cf1cff; }
             
     .warning-box {
         background-color: #fff3cd;
