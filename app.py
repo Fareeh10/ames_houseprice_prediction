@@ -5,249 +5,307 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 import joblib
 
-if 'show_inputs' not in st.session_state:
-    st.session_state.show_inputs = False
+# Set page configuration first
+st.set_page_config(page_title="Ames House Price Predictor", page_icon="🏠", layout="wide")
 
-# Load model
-model: Pipeline = joblib.load("ridge_model.pkl")
+# --- CSS STYLING (WITH THE REQUESTED CHANGE) ---
+st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+    html, body, [class*="css"] { font-family: 'Poppins', sans-serif; }
+    .main .block-container {
+        padding: 0rem;   /* Reduced from 2rem 3rem */
+        background-color: #F0F2F6;
+    }
+    .landing-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0 1rem;        /* Prevent horizontal overflow on small screens */
+        margin: 0 auto;
+        overflow: hidden;       /* Prevent scrollbars */
+    }
+    .headline { font-size: 3.5rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; }
+    .subheadline { font-size: 1.3rem; color: #34495e; margin-bottom: 2rem; max-width: 600px; }
+    .stButton>button {
+        background-color: #ff4b4b;
+        color: white;
+        font-size: 1.1em;
+        font-weight: 600;
+        padding: 0.8em 2.5em;
+        border-radius: 50px;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(255, 75, 75, 0.3);
+    }
+    .stButton>button:hover {
+        background-color: #e84343;
+        color: white; /* This line ensures the text remains white on hover */
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 75, 75, 0.4);
+    }
+    h1 { text-align: center; color: #2c3e50; }
+    h3 { color: #34495e; }
+    .card {
+        background-color: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 1rem;
+    }
+    .prediction-card { text-align: center; padding: 30px; }
+    .prediction-header { font-size: 1.5rem; font-weight: 600; color: #34495e; margin-bottom: 10px; }
+    .prediction-value { font-size: 3rem; font-weight: 700; color: #ff4b4b; }
+            
+    .warning-box {
+        background-color: #fff3cd;
+        color: #856404;
+        border-left: 6px solid #ffa502;
+        padding: 1rem 1.5rem;
+        margin-bottom: 2rem;
+        font-size: 1rem;
+        font-weight: 500;
+        border-radius: 8px;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .warning-box strong {
+        font-weight: 600;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# Load features and values
-with open('top_features.pkl', 'rb') as f:
-    top_features = pickle.load(f)
 
-with open('default_values.pkl', 'rb') as f:
-    default_values = pickle.load(f)
+# --- DATA LOADING ---
+@st.cache_data
+def load_data():
+    model = joblib.load("ridge_model.pkl")
+    with open('top_features.pkl', 'rb') as f:
+        top_features = pickle.load(f)
+    with open('default_values.pkl', 'rb') as f:
+        default_values = pickle.load(f)
+    with open('feature_names.pkl', 'rb') as f:
+        all_features = pickle.load(f)
+    return model, top_features, default_values, all_features
 
-with open('feature_names.pkl', 'rb') as f:
-    all_features = pickle.load(f)
+model, top_features, default_values, all_features = load_data()
 
-# Binary one-hot encoded features
-binary_features = [
-    'CentralAir', 'BldgType_1Fam','HalfBath'
-]
 
-# Features that were log-transformed during training
-log_transformed_features = [
-    'MasVnrArea', 'BsmtFinSF1', '1stFlrSF',
-    'GrLivArea', 'OpenPorchSF', 'EnclosedPorch', 'WoodDeckSF'
-]
-
-foundations = ['Foundation_CBlock','Foundation_PConc','Foundation_Slab','NridgHt','Somerst','StoneBr']
-
-# Categorical features mapping (string -> numeric)
+# --- FEATURE DEFINITIONS ---
 categorical_mappings = {
     'SaleCondition': {'Normal': 0, 'Partial': 1, 'Abnorml': 2, 'Family': 3, 'Alloca': 4, 'AdjLand': 5},
     'Functional': {'Typ': 0, 'Min2': 1, 'Min1': 2, 'Mod': 3, 'Maj1': 4, 'Maj2': 5, 'Sev': 6},
-    'FireplaceQu': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1, 'Poor': 0},
+    'FireplaceQu': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1, 'Poor': 0, 'No Fireplace': -1},
     'KitchenQual': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1},
     'ExterQual': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1},
     'HeatingQC': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1, 'Poor': 0},
     'PavedDrive': {'Y': 2, 'P': 1, 'N': 0},
-    "BsmtExposure": {'No':0, 'Average':1, 'Good':2,'Mb': 3},
-    'BsmtQual': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1},
+    "BsmtExposure": {'Good': 3, 'Average': 2, 'Mn': 1, 'No': 0, 'No Basement': -1},
+    'BsmtQual': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1, 'No Basement': -1},
 }
 
-cat = ['SaleCondition','Functional','FireplaceQu','KitchenQual','ExterQual','HeatingQC','PavedDrive','BsmtExposure','BsmtQual']
+# --- HELPER FUNCTION ---
+def get_default_value(feature_name, fallback, is_int=True):
+    val = default_values.get(feature_name, fallback)
+    if isinstance(val, (list, pd.Series, np.ndarray)):
+        val = val[0]
+    return int(val) if is_int else float(val)
 
-# Categorical / Ordinal encoded features with limited allowed values
-categorical_features = {
-    "OverallQual": list(range(1, 11)),
-    "YearRemodAdd": list(range(1950, 2011)),
-    "SaleCondition": [0, 1, 2, 3, 4],
-    "Functional": [0, 1, 2]
-}
-
-basement_features = ['BsmtQual', 'BsmtFinSF1', 'BsmtUnfSF', 'BsmtExposure', 'TotalBsmtSF']
-
-# Set page configuration
-st.set_page_config(page_title="Ames House Price Predictor", page_icon="🏠", layout="centered")
-
-# Initialize session state
-if "show_inputs" not in st.session_state:
+# --- SESSION STATE ---
+if 'show_inputs' not in st.session_state:
     st.session_state.show_inputs = False
+if 'prediction' not in st.session_state:
+    st.session_state.prediction = None
 
-# Landing Page
+# --- UI RENDERING ---
 if not st.session_state.show_inputs:
-    st.markdown(
-        """
-        <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
-        html, body, [class*="css"]  {
-            font-family: 'Inter', sans-serif;
-        }
-
-        .headline {
-            font-size: 3em;
-            font-weight: 700;
-            color: #ff4b4b;
-        }
-
-        .subheadline {
-            font-size: 1.2em;
-            color: #555;
-        }
-
-        .warning-box {
-            background-color: #fff3cd;
-            padding: 12px 20px;
-            border-left: 6px solid #ffa500;
-            border-radius: 5px;
-            margin-bottom: 25px;
-            color: #856404;
-        }
-
-        .centered {
-            text-align: center;
-            padding: 60px 0;
-        }
-
-        .stButton>button {
-            background-color: #ff4b4b;
-            color: white;
-            font-size: 1.1em;
-            font-weight: 600;
-            padding: 0.75em 2em;
-            border-radius: 8px;
-            border: none;
-            transition: 0.3s ease;
-        }
-
-        .stButton>button:hover {
-            background-color: #e84343;
-            color:white;
-            transform: scale(1.02);
-        }
-        </style>
-
+    st.markdown("""
         <div class="warning-box">
             🚧 <strong>Under Construction:</strong> This app is still being developed. UI/Some features may not be final.
         </div>
-
-        <div class="centered">
+        <div class="landing-container">
             <div class="headline">🏠 Ames House Price Predictor</div>
-            <div class="subheadline">Predict house prices in Ames, Iowa using a trained ML model</div>
+            <div class="subheadline">
+                Unlock accurate property valuations in Ames, Iowa.
+                Enter a few details and get an instant price estimate.
+            </div>
         </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-    # Styled "Get Started" button
-    if st.button("Get Started", use_container_width=True):
-        st.session_state.show_inputs = True
-        st.rerun()
+    """, unsafe_allow_html=True)
+    
+    _, col2, _ = st.columns([1, 1, 1])
+    with col2:
+        if st.button("Get Started", use_container_width=True):
+            st.session_state.show_inputs = True
+            st.rerun()
 
 else:
-
-    # Add a back button
-    if st.button("Back to Home"):
+    if st.button("⬅ Back to Home"):
         st.session_state.show_inputs = False
+        st.session_state.prediction = None 
         st.rerun()
 
-    # Section Header
-    st.markdown("<h2 style='text-align: center;color:#FF4B4B'>Enter Property Details</h2>", unsafe_allow_html=True)
-    st.markdown("")
+    st.markdown("<h1>Property Details</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #34495e;'>Enter the property information below to get a price prediction.</p>", unsafe_allow_html=True)
 
     user_inputs = {}
-
-    # Handle categorical string-to-numeric inputs
-    for feature, options in categorical_mappings.items():
-        reverse_map = {v: k for k, v in options.items()}
-        default_raw = default_values.get(feature, 0)
-        default_str = reverse_map.get(default_raw, list(options.keys())[0])
-        user_input = st.selectbox(f"{feature}", list(options.keys()), index=list(options.keys()).index(default_str))
-        user_inputs[feature] = options[user_input]
-
-    # --- Other Features ---
-    for feature in top_features:
-        if feature in basement_features or feature in cat:
-            continue  # already handled seprately
-
-        if feature in binary_features and feature not in ['Foundation_CBlock', 'Foundation_PConc', 'Foundation_Slab','NridgHt','Somerst','StoneBr']:
-            choice = st.radio(f"{feature}?", ["No", "Yes"], index=0, horizontal=True)
-            user_inputs[feature] = 1 if choice == "Yes" else 0
-
-        elif feature in categorical_features:
-            options = sorted(categorical_features[feature])
-            default_val = default_values.get(feature, options[0])
-        
-            # Ensure default is within the slider range
-            if default_val not in options:
-                default_val = options[0]
-        
-            user_inputs[feature] = st.slider(
-                f"{feature}",
-                min_value=min(options),
-                max_value=max(options),
-                step=1,  # Important for discrete numeric categories
-                value=default_val
-            )
-
-        elif feature in log_transformed_features:
-            log_val = default_values.get(feature, 0)
-            normal_val_default = round(np.expm1(log_val))
-            normal_val = st.number_input(f"{feature} (normal value)", value=normal_val_default, min_value=0)
-            user_inputs[feature] = np.log1p(normal_val)
-
-        else:
-            if feature in foundations:
-                continue;
-            default = round(default_values.get(feature, 0))
-            user_inputs[feature] = st.number_input(f"{feature}", value=default)
-
-    # --- Basement Features ---
-    with st.expander("Basement Features"):
-        
-        for feature in basement_features:
-            if feature in categorical_features:
-                options = categorical_features[feature]
-                default_val = default_values.get(feature, options[0])
-                index = options.index(default_val) if default_val in options else 0
-                user_inputs[feature] = st.slider(f"{feature}", min_value=min(options), max_value=max(options), value=options[index])
-            elif feature in log_transformed_features:
-                log_val = default_values.get(feature, 0)
-                normal_val_default = round(np.expm1(log_val))
-                normal_val = st.number_input(f"{feature} (normal value)", value=normal_val_default, min_value=0)
-                user_inputs[feature] = np.log1p(normal_val)
-            else:
-                default = round(default_values.get(feature, 0))
-                user_inputs[feature] = st.number_input(f"{feature}", value=default)
-
-    foundation_options = ['CBlock', 'PConc', 'Slab', 'Other']
-    foundation_feature_map = {
-        'CBlock': 'Foundation_CBlock',
-        'PConc': 'Foundation_PConc',
-        'Slab': 'Foundation_Slab'
-    }
-    default_foundation = 'CBlock'
-
-    selected_foundation = st.selectbox("Select Foundation Type", foundation_options, index=foundation_options.index(default_foundation))
-
-    # Initialize all features to 0
-    for feature in foundation_feature_map.values():
-        user_inputs[feature] = 0
-
-    # Set selected feature to 1 if it's not 'Other'
-    if selected_foundation in foundation_feature_map:
-        user_inputs[foundation_feature_map[selected_foundation]] = 1
-
-    neighborhood_options = ['NridgHt', 'Somerst', 'StoneBr', 'Other']
-    neighborhood_selection = st.selectbox("Select Neighborhood", neighborhood_options)
     
-    # One-hot encode neighborhood selection
-    for neighborhood in neighborhood_options:
-        user_inputs[neighborhood] = 1 if neighborhood_selection == neighborhood else 0
+    with st.container():
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        
+        st.subheader("Key Features")
+        col1, col2 = st.columns(2)
+        with col1:
+            user_inputs['OverallQual'] = st.slider("Overall Quality", 1, 10, get_default_value('OverallQual', 7), 1, help="Rates the overall material and finish of the house (1-10).")
+        with col2:
+            normal_val_default = round(np.expm1(get_default_value('GrLivArea', 7.2, is_int=False)))
+            normal_val = st.number_input("Above Ground Living Area (sq. ft)", value=normal_val_default, min_value=0, step=50, help="Total square feet of living space above ground.")
+            user_inputs['GrLivArea'] = np.log1p(normal_val)
 
+        col1, col2 = st.columns(2)
+        with col1:
+            if 'YearBuilt' in all_features:
+                user_inputs['YearBuilt'] = st.number_input("Year Built", 1800, 2025, get_default_value('YearBuilt', 2005), help="Original construction date.")
+        with col2:
+            user_inputs['YearRemodAdd'] = st.slider("Year Remodeled", 1950, 2011, get_default_value('YearRemodAdd', 2005), help="Remodel date (same as construction date if no remodeling).")
 
-    # Fill in other features not shown to user
-    input_data = default_values.copy()
-    input_data.update(user_inputs)
+        tab1, tab2, tab3, tab4 = st.tabs(["🏡 Exterior & Location", "📏 Area Details", "✨ Quality & Condition", "🛁 Rooms & Utilities"])
 
-    # Arrange inputs in correct order
-    input_df = pd.DataFrame([input_data])[all_features]
+        with tab1:
+            st.markdown("<h3>Location & Construction</h3>", unsafe_allow_html=True)
+            col1, col2 = st.columns(2)
+            with col1:
+                neighborhood_options = ['NridgHt', 'Somerst', 'StoneBr', 'Other']
+                neighborhood_selection = st.selectbox("Neighborhood", neighborhood_options, help="The physical location of the property within Ames.")
+                for neighborhood in ['NridgHt', 'Somerst', 'StoneBr']:
+                     user_inputs[neighborhood] = 1 if neighborhood_selection == neighborhood else 0
+            with col2:
+                foundation_options = ['Poured Concrete', 'Cinder Block', 'Slab', 'Other']
+                foundation_map = {'Poured Concrete': 'Foundation_PConc', 'Cinder Block': 'Foundation_CBlock', 'Slab': 'Foundation_Slab'}
+                selected_foundation_str = st.selectbox("Foundation Type", foundation_options, help="Type of foundation.")
+                for key, val in foundation_map.items():
+                    user_inputs[val] = 1 if selected_foundation_str == key else 0
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                options = list(categorical_mappings['PavedDrive'].keys())
+                drive_str = st.selectbox("Paved Driveway", options, index=0)
+                user_inputs['PavedDrive'] = categorical_mappings['PavedDrive'][drive_str]
+            with col2:
+                normal_val_default = round(np.expm1(get_default_value('MasVnrArea', 0, is_int=False)))
+                normal_val = st.number_input("Masonry Veneer Area (sq. ft)", value=normal_val_default, min_value=0, step=10, help="Masonry veneer area in square feet. Enter 0 if none.")
+                user_inputs['MasVnrArea'] = np.log1p(normal_val)
 
-    # Predict and display
-    if st.button("🔍 Predict Sale Price"):
-        log_price = model.predict(input_df)[0]
-        final_price = np.expm1(log_price)
-        st.success(f"🏡 Estimated Sale Price: **${final_price:,.0f}**")
+        with tab2:
+            st.markdown("<h3>Basement Details</h3>", unsafe_allow_html=True)
+            col1, col2 = st.columns(2)
+            with col1:
+                options = list(categorical_mappings['BsmtQual'].keys())
+                bsmt_qual_str = st.selectbox("Basement Quality", options, index=0, help="Evaluates the height of the basement.")
+                user_inputs['BsmtQual'] = categorical_mappings['BsmtQual'][bsmt_qual_str]
+            with col2:
+                options = list(categorical_mappings['BsmtExposure'].keys())
+                bsmt_exp_str = st.selectbox("Basement Exposure", options, index=3, help="Refers to walkout or garden level walls.")
+                user_inputs['BsmtExposure'] = categorical_mappings['BsmtExposure'][bsmt_exp_str]
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                normal_val_default = round(np.expm1(get_default_value('BsmtFinSF1', 0, is_int=False)))
+                normal_val = st.number_input("Finished Basement Area (sq. ft)", value=normal_val_default, min_value=0, step=50, help="Type 1 finished square feet of basement area.")
+                user_inputs['BsmtFinSF1'] = np.log1p(normal_val)
+            with col2:
+                user_inputs['TotalBsmtSF'] = st.number_input("Total Basement Area (sq. ft)", value=get_default_value('TotalBsmtSF', 864), min_value=0, step=50, help="Total square feet of basement area.")
+                
+            st.markdown("<h3 style='margin-top: 1.5rem;'>Porch & Deck Area</h3>", unsafe_allow_html=True)
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                normal_val_default = round(np.expm1(get_default_value('WoodDeckSF', 0, is_int=False)))
+                normal_val = st.number_input("Wood Deck (sq. ft)", value=normal_val_default, min_value=0, key='WoodDeckSF')
+                user_inputs['WoodDeckSF'] = np.log1p(normal_val)
+            with col2:
+                normal_val_default = round(np.expm1(get_default_value('OpenPorchSF', 0, is_int=False)))
+                normal_val = st.number_input("Open Porch (sq. ft)", value=normal_val_default, min_value=0, key='OpenPorchSF')
+                user_inputs['OpenPorchSF'] = np.log1p(normal_val)
+            with col3:
+                normal_val_default = round(np.expm1(get_default_value('EnclosedPorch', 0, is_int=False)))
+                normal_val = st.number_input("Enclosed Porch (sq. ft)", value=normal_val_default, min_value=0, key='EnclosedPorch')
+                user_inputs['EnclosedPorch'] = np.log1p(normal_val)
+
+        with tab3:
+            col1, col2 = st.columns(2)
+            with col1:
+                options = list(categorical_mappings['ExterQual'].keys())
+                ext_qual_str = st.selectbox("Exterior Quality", options, index=1, help="Evaluates the quality of the material on the exterior.")
+                user_inputs['ExterQual'] = categorical_mappings['ExterQual'][ext_qual_str]
+            with col2:
+                options = list(categorical_mappings['KitchenQual'].keys())
+                kit_qual_str = st.selectbox("Kitchen Quality", options, index=1, help="Quality of the kitchen.")
+                user_inputs['KitchenQual'] = categorical_mappings['KitchenQual'][kit_qual_str]
+
+            col1, col2 = st.columns(2)
+            with col1:
+                options = list(categorical_mappings['HeatingQC'].keys())
+                heat_qc_str = st.selectbox("Heating Quality/Condition", options, index=0, help="Overall quality and condition of the heating system.")
+                user_inputs['HeatingQC'] = categorical_mappings['HeatingQC'][heat_qc_str]
+            with col2:
+                options = list(categorical_mappings['FireplaceQu'].keys())
+                fire_qu_str = st.selectbox("Fireplace Quality", options, index=len(options)-1, help="Quality of the fireplace. Select 'No Fireplace' if applicable.")
+                user_inputs['FireplaceQu'] = categorical_mappings['FireplaceQu'][fire_qu_str]
+
+            col1, col2 = st.columns(2)
+            with col1:
+                options = list(categorical_mappings['Functional'].keys())
+                func_str = st.selectbox("Home Functionality", options, index=0, help="Home functionality rating (Assume typical unless deductions).")
+                user_inputs['Functional'] = categorical_mappings['Functional'][func_str]
+            with col2:
+                options = list(categorical_mappings['SaleCondition'].keys())
+                sc_str = st.selectbox("Sale Condition", options, index=0, help="Condition of sale.")
+                user_inputs['SaleCondition'] = categorical_mappings['SaleCondition'][sc_str]
+        
+        with tab4:
+            col1, col2 = st.columns(2)
+            with col1:
+                if 'FullBath' in all_features:
+                     user_inputs['FullBath'] = st.number_input("Full Bathrooms", 0, 5, get_default_value('FullBath', 2), help="Number of full bathrooms above grade.")
+            with col2:
+                user_inputs['HalfBath'] = st.radio("Half Bathrooms", [0, 1, 2], index=get_default_value('HalfBath', 1), horizontal=True, help="Number of half bathrooms above grade.")
+
+            col1, col2 = st.columns(2)
+            with col1:
+                if 'BedroomAbvGr' in all_features:
+                    user_inputs['BedroomAbvGr'] = st.number_input("Bedrooms Above Grade", 0, 8, get_default_value('BedroomAbvGr', 3), help="Number of bedrooms not in the basement.")
+            with col2:
+                if 'TotRmsAbvGrd' in all_features:
+                    user_inputs['TotRmsAbvGrd'] = st.number_input("Total Rooms Above Grade", 2, 15, get_default_value('TotRmsAbvGrd', 6), help="Total rooms above grade (does not include bathrooms).")
+
+            st.markdown("<h3 style='margin-top: 1.5rem;'>Utilities</h3>", unsafe_allow_html=True)
+            user_inputs['CentralAir'] = 1 if st.toggle('Central Air Conditioning', value=True) else 0
+
+        st.markdown('</div>', unsafe_allow_html=True) 
+
+    st.markdown("<br>", unsafe_allow_html=True)
+    _, col2, _ = st.columns([1, 1.5, 1])
+    with col2:
+        if st.button("🔍 Predict Sale Price", use_container_width=True):
+            input_data = default_values.copy()
+            input_data.update(user_inputs)
+            input_df = pd.DataFrame([input_data])[all_features]
+
+            try:
+                log_price = model.predict(input_df)[0]
+                final_price = np.expm1(log_price)
+                st.session_state.prediction = final_price
+            except Exception as e:
+                st.error(f"An error occurred during prediction: {e}")
+                st.session_state.prediction = None
+
+    if st.session_state.prediction is not None:
+        st.markdown(f"""
+        <div class="card prediction-card">
+            <div class="prediction-header">Estimated Sale Price</div>
+            <div class="prediction-value">${st.session_state.prediction:,.0f}</div>
+        </div>
+        """, unsafe_allow_html=True)
