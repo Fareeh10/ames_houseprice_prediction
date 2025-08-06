@@ -30,7 +30,7 @@ st.markdown("""
     .headline { font-size: 3.5rem; font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; }
     .subheadline { font-size: 1.3rem; color: #34495e; margin-bottom: 2rem; max-width: 600px; }
     .stButton>button {
-        background-color: #ff4b4b;
+        background-color: #cf1cff;
         color: white;
         font-size: 1.1em;
         font-weight: 600;
@@ -38,13 +38,13 @@ st.markdown("""
         border-radius: 50px;
         border: none;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(255, 75, 75, 0.3);
+        box-shadow: 0 4px 15px rgba(189, 75, 255, 0.3);
     }
     .stButton>button:hover {
-        background-color: #e84343;
+        background-color: #cf1cff;
         color: white; /* This line ensures the text remains white on hover */
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(255, 75, 75, 0.4);
+        box-shadow: 0 4px 15px rgba(189, 75, 255, 0.3);
     }
     h1 { text-align: center; color: #2c3e50; }
     h3 { color: #34495e; }
