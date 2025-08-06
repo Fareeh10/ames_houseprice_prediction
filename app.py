@@ -143,7 +143,7 @@ if not st.session_state.show_inputs:
             st.rerun()
 
 else:
-    if st.button("⬅ Back to Home"):
+    if st.button("Back to Home"):
         st.session_state.show_inputs = False
         st.session_state.prediction = None 
         st.rerun()
