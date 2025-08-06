@@ -65,7 +65,7 @@ st.markdown("""
         background-color: #fff3cd;
         color: #856404;
         border-left: 6px solid #ffa502;
-        padding: 1rem 1.5rem;
+        padding: 1rem 1rem;
         margin-bottom: 2rem;
         font-size: 1rem;
         font-weight: 500;
