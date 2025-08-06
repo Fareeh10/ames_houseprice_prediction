@@ -128,7 +128,7 @@ if not st.session_state.show_inputs:
             🚧 <strong>Under Construction:</strong> This app is still being developed. UI/Some features may not be final.
         </div>
         <div class="landing-container">
-            <div class="headline">🏠 Ames House Price Predictor</div>
+            <div class="headline">Ames House Price Predictor</div>
             <div class="subheadline">
                 Unlock accurate property valuations in Ames, Iowa.
                 Enter a few details and get an instant price estimate.
