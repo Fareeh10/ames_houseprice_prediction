@@ -27,7 +27,7 @@ st.markdown("""
         margin: 0 auto;
         overflow: hidden;       /* Prevent scrollbars */
     }
-    .headline { font-size: 3.5rem; line-height:2.5rem ;font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; }
+    .headline { font-size: 3.5rem; line-height:3rem ;font-weight: 700; color: #2c3e50; margin-bottom: 0.5rem; }
     .subheadline { font-size: 1.3rem; color: #34495e; margin-bottom: 2rem; max-width: 600px; }
     .stButton>button {
         background-color: #cf1cff;
