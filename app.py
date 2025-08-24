@@ -32,7 +32,7 @@ st.markdown("""
     .headline { font-size: 3.5rem; line-height:4rem ;font-weight: 700; color: #2c3e50; margin-bottom: 1.5rem; }
     .subheadline { font-size: 1.3rem; color: #34495e; margin-bottom: 2rem; max-width: 600px; }
     .stButton>button {
-        background-color: #cf1cff;
+        background-color: #af806d;
         color: white;
         font-size: 1.1em;
         font-weight: 600;
@@ -43,7 +43,7 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(189, 75, 255, 0.3);
     }
     .stButton>button:hover {
-        background-color: #cf1cff;
+        background-color: #af806d;
         color: white; /* This line ensures the text remains white on hover */
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(189, 75, 255, 0.3);
@@ -59,7 +59,7 @@ st.markdown("""
     }
     .prediction-card { text-align: center; padding: 30px; }
     .prediction-header { font-size: 1.5rem; font-weight: 600; color: #34495e; margin-bottom: 10px; }
-    .prediction-value { font-size: 3rem; font-weight: 700; color: #cf1cff; }
+    .prediction-value { font-size: 3rem; font-weight: 700; color: #af806d; }
             
     .warning-box {
         background-color: #fff3cd;
