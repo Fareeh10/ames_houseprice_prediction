@@ -29,7 +29,7 @@ st.markdown("""
         text-align: center;
         padding-top: 8%;
     }
-    .headline { font-size: 3.5rem; line-height:4rem ;font-weight: 700; color: #2c3e50; margin-bottom: 1.5rem; }
+    .headline { font-size: 3.5rem; line-height:4rem ;font-weight: 700; color: #fff; margin-bottom: 1.5rem; }
     .subheadline { font-size: 1.3rem; color: #34495e; margin-bottom: 2rem; max-width: 600px; }
     .stButton>button {
         background-color: #af806d;
@@ -48,8 +48,8 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(189, 75, 255, 0.3);
     }
-    h1 { text-align: center; color: #2c3e50; }
-    h3 { color: #34495e; }
+    h1 { text-align: center; color: #fff; }
+    h3 { color: #fff; }
     .card {
         background-color: white;
         border-radius: 12px;
@@ -58,8 +58,8 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     .prediction-card { text-align: center; padding: 30px; }
-    .prediction-header { font-size: 1.5rem; font-weight: 600; color: #34495e; margin-bottom: 10px; }
-    .prediction-value { font-size: 3rem; font-weight: 700; color: #af806d; }
+    .prediction-header { font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 10px; }
+    .prediction-value { font-size: 3rem; font-weight: 700; color: #fff; }
 </style>
 """, unsafe_allow_html=True)
 
