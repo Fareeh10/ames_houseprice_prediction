@@ -29,8 +29,8 @@ st.markdown("""
         text-align: center;
         padding-top: 8%;
     }
-    .headline { font-size: 3.5rem; line-height:4rem ;font-weight: 700; color: #fff; margin-bottom: 1.5rem; }
-    .subheadline { font-size: 1.3rem; color: #34495e; margin-bottom: 2rem; max-width: 600px; }
+    .headline { font-size: 3.5rem; line-height:4rem ;font-weight: 700; color: #af806d; margin-bottom: 1.5rem; }
+    .subheadline { font-size: 1.3rem; color: #fff; margin-bottom: 2rem; max-width: 600px; }
     .stButton>button {
         background-color: #af806d;
         color: white;
