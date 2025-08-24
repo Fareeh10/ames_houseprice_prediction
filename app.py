@@ -46,7 +46,7 @@ st.markdown("""
         background-color: #af806d;
         color: white; /* This line ensures the text remains white on hover */
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(189, 75, 255, 0.3);
+        box-shadow: 0 4px 15px rgba(193, 118, 89, 0.3);
     }
     h1 { text-align: center; color: #fff; }
     h3 { color: #fff; }
