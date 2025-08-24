@@ -40,7 +40,7 @@ st.markdown("""
         border-radius: 50px;
         border: none;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(189, 75, 255, 0.3);
+        box-shadow: 0 4px 15px rgba(188, 99, 71, 0.3);
     }
     .stButton>button:hover {
         background-color: #af806d;
