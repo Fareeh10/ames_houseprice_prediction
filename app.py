@@ -60,25 +60,6 @@ st.markdown("""
     .prediction-card { text-align: center; padding: 30px; }
     .prediction-header { font-size: 1.5rem; font-weight: 600; color: #34495e; margin-bottom: 10px; }
     .prediction-value { font-size: 3rem; font-weight: 700; color: #af806d; }
-            
-    .warning-box {
-        background-color: #fff3cd;
-        color: #856404;
-        border-left: 6px solid #ffa502;
-        padding: 1rem 1rem;
-        padding-left:1.3rem;
-        margin-bottom: 2rem;
-        font-size: 0.9rem;
-        font-weight: 500;
-        border-radius: 8px;
-        max-width: 700px;
-        margin-left: auto;
-        margin-right: auto;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-    .warning-box strong {
-        font-weight: 600;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -127,9 +108,6 @@ if 'prediction' not in st.session_state:
 # --- UI RENDERING ---
 if not st.session_state.show_inputs:
     st.markdown("""
-        <div class="warning-box">
-            🚧 <strong>Under Construction:</strong> This app is still being developed. UI/Some features may not be final.
-        </div>
         <div class="landing-container">
             <div class="headline">Ames House Price Predictor</div>
             <div class="subheadline">
