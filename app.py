@@ -51,7 +51,7 @@ st.markdown("""
     h1 { text-align: center; color: #fff; }
     h3 { color: #fff; }
     .card {
-        background-color: white;
+        background-color: color(srgb 0.0569 0.067 0.0881);
         border-radius: 12px;
         padding: 25px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -59,7 +59,7 @@ st.markdown("""
     }  
     .prediction-card { text-align: center; padding: 30px; }
     .prediction-header { font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 10px; }
-    .prediction-value { font-size: 3rem; font-weight: 700; color: #fff; }
+    .prediction-value { font-size: 3rem; font-weight: 700; color: #00bf63; }
 </style>
 """, unsafe_allow_html=True)
 
