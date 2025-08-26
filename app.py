@@ -15,7 +15,7 @@ st.markdown("""
     html, body, [class*="css"] { font-family: 'Poppins', sans-serif; }
     .main .block-container {
         padding: 0rem;   /* Reduced from 2rem 3rem */
-        background-color: #F0F2F6;
+        background-color: #00bf63;
     }
     .landing-container {
         display: flex;
@@ -32,7 +32,7 @@ st.markdown("""
     .headline { font-size: 3.5rem; line-height:4rem ;font-weight: 700; color: #af806d; margin-bottom: 1.5rem; }
     .subheadline { font-size: 1.3rem; color: #fff; margin-bottom: 2rem; max-width: 600px; }
     .stButton>button {
-        background-color: #af806d;
+        background-color: #00bf63;
         color: white;
         font-size: 1.1em;
         font-weight: 600;
@@ -43,7 +43,7 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(188, 99, 71, 0.3);
     }
     .stButton>button:hover {
-        background-color: #af806d;
+        background-color: #00bf63;
         color: white; /* This line ensures the text remains white on hover */
         transform: translateY(-2px);
         box-shadow: 0 4px 15px rgba(193, 118, 89, 0.3);
