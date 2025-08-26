@@ -29,7 +29,7 @@ st.markdown("""
         text-align: center;
         padding-top: 8%;
     }
-    .headline { font-size: 3.5rem; line-height:4rem ;font-weight: 700; color: #af806d; margin-bottom: 1.5rem; }
+    .headline { font-size: 3.5rem; line-height:4rem ;font-weight: 700; color: #00bf63; margin-bottom: 1.5rem; }
     .subheadline { font-size: 1.3rem; color: #fff; margin-bottom: 2rem; max-width: 600px; }
     .stButton>button {
         background-color: #00bf63;
@@ -56,7 +56,7 @@ st.markdown("""
         padding: 25px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         margin-bottom: 1rem;
-    }
+    }  
     .prediction-card { text-align: center; padding: 30px; }
     .prediction-header { font-size: 1.5rem; font-weight: 600; color: #fff; margin-bottom: 10px; }
     .prediction-value { font-size: 3rem; font-weight: 700; color: #fff; }
