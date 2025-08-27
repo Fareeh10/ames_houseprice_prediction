@@ -18,16 +18,8 @@ st.markdown("""
         background-color: #00bf63;
     }
     .landing-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        padding: 0 1rem;        /* Prevent horizontal overflow on small screens */
-        margin: 0 auto;
-        overflow: hidden;       /* Prevent scrollbars */
-        text-align: center;
-        padding-top: 8%;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        text-align: center; padding-top: 12%;
     }
     .headline { font-size: 3.5rem; line-height:4rem ;font-weight: 700; color: #00bf63; margin-bottom: 1.5rem; }
     .subheadline { font-size: 1.3rem; color: #fff; margin-bottom: 2rem; max-width: 600px; }
