@@ -6,7 +6,7 @@ from sklearn.pipeline import Pipeline
 import joblib
 
 # Set page configuration first
-st.set_page_config(page_title="Ames House Price Predictor", page_icon="🏠", layout="wide")
+st.set_page_config(page_title="Ames House Price Predictor", page_icon="", layout="wide")
 
 # --- CSS STYLING (WITH THE REQUESTED CHANGE) ---
 st.markdown("""
