@@ -78,7 +78,6 @@ def load_data():
 
 model, top_features, default_values, all_features = load_data()
 
-
 # --- FEATURE DEFINITIONS ---
 categorical_mappings = {
     'SaleCondition': {'Normal': 0, 'Partial': 1, 'Abnorml': 2, 'Family': 3, 'Alloca': 4, 'AdjLand': 5},
@@ -87,11 +86,13 @@ categorical_mappings = {
     'KitchenQual': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1},
     'ExterQual': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1},
     'HeatingQC': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1, 'Poor': 0},
-    'PavedDrive': {'Y': 2, 'P': 1, 'N': 0},
+    'PavedDrive': {'Paved': 2, 'Partial': 1, 'None': 0},
     "BsmtExposure": {'Good': 3, 'Average': 2, 'Mn': 1, 'No': 0, 'No Basement': -1},
     'BsmtQual': {'Excellent': 4, 'Good': 3, 'Typical/Average': 2, 'Fair': 1, 'No Basement': -1},
+    'GarageCond' : {'None/Poor':1,'Fair':2,'Average':3,'Good/Excellent':4},
+    'GarageCars' : {'0':0,'1':1,'2':2,'3 or more':3}
 }
-
+                                                                                                                            
 # --- HELPER FUNCTION ---
 def get_default_value(feature_name, fallback, is_int=True):
     val = default_values.get(feature_name, fallback)
@@ -135,7 +136,7 @@ else:
     user_inputs = {}
     
     with st.container():
-        st.subheader("Key Features")
+        st.subheader("Key Features")                                        
         col1, col2 = st.columns(2)
         with col1:
             user_inputs['OverallQual'] = st.slider("Overall Quality", 1, 10, get_default_value('OverallQual', 7), 1, help="Rates the overall material and finish of the house (1-10).")
@@ -149,7 +150,16 @@ else:
             if 'YearBuilt' in all_features:
                 user_inputs['YearBuilt'] = st.number_input("Year Built", 1800, 2025, get_default_value('YearBuilt', 2005), help="Original construction date.")
         with col2:
-            user_inputs['YearRemodAdd'] = st.slider("Year Remodeled", 1950, 2011, get_default_value('YearRemodAdd', 2005), help="Remodel date (same as construction date if no remodeling).")
+            user_inputs['YearRemodAdd'] = st.slider("Year Remodeled", 1950, 2025, get_default_value('YearRemodAdd', 2005), help="Remodel date (same as construction date if no remodeling else). Date should be greater than construction date")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            first_flr_raw = st.number_input("1st Floor SF", 100, 8000, 600,help="First Floor Square Feet")
+            user_inputs['1stFlrSF'] = np.log1p(first_flr_raw)  
+
+        with col2:
+            second_flr_raw = st.number_input("2nd Floor SF", 0, 8000,get_default_value('2ndFlrSF', 0),help="Second Floor Square Feet")
+            user_inputs['2ndFlrSF'] = np.log1p(second_flr_raw)
 
         tab1, tab2, tab3, tab4 = st.tabs(["Exterior & Location", "Area Details", "Quality & Condition", "Rooms & Utilities"])
 
@@ -177,6 +187,10 @@ else:
                 normal_val_default = round(np.expm1(get_default_value('MasVnrArea', 0, is_int=False)))
                 normal_val = st.number_input("Masonry Veneer Area (sq. ft)", value=normal_val_default, min_value=0, step=10, help="Masonry veneer area in square feet. Enter 0 if none.")
                 user_inputs['MasVnrArea'] = np.log1p(normal_val)
+ 
+            col1, = st.columns(1)
+            with col1:
+                user_inputs['LotArea'] = st.number_input("Lot Area (sq. ft)", min_value=700,value = get_default_value('LotArea', 700), help="Lot Area area in square feet")
 
         with tab2:
             st.markdown("<h3>Basement Details</h3>", unsafe_allow_html=True)
@@ -213,6 +227,12 @@ else:
                 normal_val = st.number_input("Enclosed Porch (sq. ft)", value=normal_val_default, min_value=0, key='EnclosedPorch')
                 user_inputs['EnclosedPorch'] = np.log1p(normal_val)
 
+            col1,col2 = st.columns(2)
+            with col1:
+                options = list(categorical_mappings['GarageCars'].keys())
+                cars_str = st.selectbox("Garage Capacity (No. of cars)", options, index=0, help="No. of Cars that can bbe parked in the Garage")
+                user_inputs['GarageCars'] = categorical_mappings['GarageCars'][cars_str]
+
         with tab3:
             col1, col2 = st.columns(2)
             with col1:
@@ -243,6 +263,13 @@ else:
                 options = list(categorical_mappings['SaleCondition'].keys())
                 sc_str = st.selectbox("Sale Condition", options, index=0, help="Condition of sale.")
                 user_inputs['SaleCondition'] = categorical_mappings['SaleCondition'][sc_str]
+
+            col1,col2 = st.columns(2)
+            with col1:
+                options = list(categorical_mappings['GarageCond'].keys())
+                cars_str = st.selectbox("Garage Condition", options, index=0, help="Garage Condition")
+                user_inputs['GarageCond'] = categorical_mappings['GarageCond'][cars_str]
+
         
         with tab4:
             col1, col2 = st.columns(2)
@@ -253,10 +280,10 @@ else:
                 user_inputs['HalfBath'] = st.radio("Half Bathrooms", [0, 1, 2], index=get_default_value('HalfBath', 1), horizontal=True, help="Number of half bathrooms above grade.")
 
             col1, col2 = st.columns(2)
-            with col1:
+            with col2:
                 if 'BedroomAbvGr' in all_features:
                     user_inputs['BedroomAbvGr'] = st.number_input("Bedrooms Above Grade", 0, 8, get_default_value('BedroomAbvGr', 3), help="Number of bedrooms not in the basement.")
-            with col2:
+            with col1:
                 if 'TotRmsAbvGrd' in all_features:
                     user_inputs['TotRmsAbvGrd'] = st.number_input("Total Rooms Above Grade", 2, 15, get_default_value('TotRmsAbvGrd', 6), help="Total rooms above grade (does not include bathrooms).")
 
